@@ -2,28 +2,29 @@ package main
 
 import (
 	"fmt"
-	"go-blog-api/pkg/config"
-	"go-blog-api/pkg/util"
 	"net/http"
-	"strconv"
+
+	"go-blog-api/internal/router"
+	"go-blog-api/pkg/config"
 )
 
 func main() {
 	// 1. 初始化配置
 	config.InitConfig()
-	fmt.Println("Configuration loaded successfully")
 
-	// 2. 启动 Web 服务 (暂时用 net/http 演示)
-	http.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		ret := util.AddCount(1, 3) // 示例调用 util 包中的函数
-		w.Write([]byte("pong"))
-		w.Write([]byte(strconv.Itoa(ret)))
-	})
+	// 2. 初始化 Gin 路由
+	r := router.InitRouter()
 
+	// 3. 启动服务
 	addr := ":" + config.AppConfig.Server.Port
-	fmt.Printf("Server is running on http://localhost%s\n", addr)
+	fmt.Printf("Server starting on %s\n", addr)
 
-	if err := http.ListenAndServe(addr, nil); err != nil {
+	srv := &http.Server{
+		Addr:    addr,
+		Handler: r, // 把 Gin Engine 作为 HTTP Handler 传入
+	}
+
+	if err := srv.ListenAndServe(); err != nil {
 		panic(err)
 	}
 }

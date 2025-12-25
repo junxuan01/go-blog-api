@@ -1,13 +1,35 @@
 package router
 
 import (
-	"go-blog-api/internal/api"
-	"net/http"
+	v1 "go-blog-api/internal/api/v1"
+	"go-blog-api/pkg/config"
+
+	"github.com/gin-gonic/gin"
 )
 
-// SetupRouter returns the http handler with routes registered.
-func SetupRouter() http.Handler {
-	mux := http.NewServeMux()
-	mux.HandleFunc("/health", api.HealthHandler)
-	return mux
+func InitRouter() *gin.Engine {
+	// 设置运行模式：debug / release，从配置读取
+	gin.SetMode(config.AppConfig.Server.Mode)
+	// 推荐使用 gin.New() 而不是 gin.Default()，便于精细控制中间件
+	r := gin.New()
+	r.Use(gin.Logger())   // 日志中间件
+	r.Use(gin.Recovery()) // 恢复中间件，防止崩溃
+
+	// 初始化 Controller
+	articleCtrl := v1.NewArticleController()
+
+	// 路由分组：/api/v1 作为统一前缀，方便做版本控制
+	apiV1 := r.Group("/api/v1")
+	{
+		// /api/v1/articles 相关接口
+		articles := apiV1.Group("/articles")
+		{
+			// GET /api/v1/articles/:id
+			articles.GET(":id", articleCtrl.GetArticle)
+			// 后续会在这里继续挂载：
+			// articles.POST("", articleCtrl.CreateArticle)
+			// articles.PUT(":id", articleCtrl.UpdateArticle)
+		}
+	}
+	return r
 }
