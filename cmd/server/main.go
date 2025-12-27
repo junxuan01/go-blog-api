@@ -6,16 +6,23 @@ import (
 
 	"go-blog-api/internal/router"
 	"go-blog-api/pkg/config"
+	"go-blog-api/pkg/db"
 )
 
 func main() {
 	// 1. 初始化配置
 	config.InitConfig()
 
-	// 2. 初始化 Gin 路由
+	// 2. 初始化数据库连接
+	db.InitDB()
+
+	// 3. 自动迁移数据表（等创建Model后再启用）
+	// db.AutoMigrate(&model.Article{}, &model.User{})
+
+	// 4. 初始化 Gin 路由
 	r := router.InitRouter()
 
-	// 3. 启动服务
+	// 5. 启动服务
 	addr := ":" + config.AppConfig.Server.Port
 	fmt.Printf("Server starting on %s\n", addr)
 

@@ -27,6 +27,7 @@ func InitRouter() *gin.Engine {
 			// GET /api/v1/articles/:id
 			articles.GET(":id", articleCtrl.GetArticle)
 			// 后续会在这里继续挂载：
+			articles.GET("", articleCtrl.ListArticles)
 			// articles.POST("", articleCtrl.CreateArticle)
 			// articles.PUT(":id", articleCtrl.UpdateArticle)
 		}
