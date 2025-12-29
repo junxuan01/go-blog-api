@@ -29,7 +29,7 @@ func (ctrl *ArticleController) GetArticle(c *gin.Context) {
 		return
 	}
 	// 模拟从Service层获取数据
-	mockArticle := map[string]interface{}{
+	mockArticle := map[string]any{
 		"id":      id,
 		"title":   "Gin 实战指南",
 		"content": "Gin 是一个高性能的 Go Web 框架...",

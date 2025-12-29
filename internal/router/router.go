@@ -17,10 +17,19 @@ func InitRouter() *gin.Engine {
 
 	// 初始化 Controller
 	articleCtrl := v1.NewArticleController()
-
+	userCtrl := v1.NewUserController()
 	// 路由分组：/api/v1 作为统一前缀，方便做版本控制
 	apiV1 := r.Group("/api/v1")
 	{
+
+		// /api/v1/auth 用户相关
+		auth := apiV1.Group("/auth")
+		{
+			auth.POST("/register", userCtrl.Register)
+			// auth.POST("/login", userCtrl.Login)
+
+		}
+
 		// /api/v1/articles 相关接口
 		articles := apiV1.Group("/articles")
 		{

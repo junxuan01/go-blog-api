@@ -44,7 +44,7 @@ func InitDB() {
 }
 
 // AutoMigrate 自动迁移数据库表结构
-func AutoMigrate(models ...interface{}) {
+func AutoMigrate(models ...any) {
 	if err := DB.AutoMigrate(models...); err != nil {
 		log.Fatalf("Failed to migrate database: %v", err)
 	}

@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"net/http"
 
+	"go-blog-api/internal/model"
 	"go-blog-api/internal/router"
 	"go-blog-api/pkg/config"
 	"go-blog-api/pkg/db"
@@ -17,7 +18,7 @@ func main() {
 	db.InitDB()
 
 	// 3. 自动迁移数据表（等创建Model后再启用）
-	// db.AutoMigrate(&model.Article{}, &model.User{})
+	db.AutoMigrate(&model.User{}, &model.Article{}, &model.Comment{})
 
 	// 4. 初始化 Gin 路由
 	r := router.InitRouter()
