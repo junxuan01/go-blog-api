@@ -2,6 +2,7 @@ package router
 
 import (
 	v1 "go-blog-api/internal/api/v1"
+	"go-blog-api/internal/middleware"
 	"go-blog-api/pkg/config"
 
 	"github.com/gin-gonic/gin"
@@ -25,13 +26,13 @@ func InitRouter() *gin.Engine {
 		// /api/v1/auth 用户相关
 		auth := apiV1.Group("/auth")
 		{
+			auth.POST("/login", userCtrl.Login)
 			auth.POST("/register", userCtrl.Register)
-			// auth.POST("/login", userCtrl.Login)
-
 		}
 
 		// /api/v1/articles 相关接口
 		articles := apiV1.Group("/articles")
+		articles.Use(middleware.JWT()) // 挂载中间件
 		{
 			// GET /api/v1/articles/:id
 			articles.GET(":id", articleCtrl.GetArticle)

@@ -24,6 +24,25 @@ func NewUserController() *UserController {
 	}
 }
 
+// Login 用户登录接口
+func (ctrl *UserController) Login(c *gin.Context) {
+	var req service.LoginRequest
+	// 参数绑定与校验
+	if err := c.ShouldBindJSON(&req); err != nil {
+		util.Error(c, http.StatusBadRequest, 40001, err.Error())
+		return
+	}
+
+	// 调用业务逻辑
+	resp, err := ctrl.userService.Login(&req)
+	if err != nil {
+		util.Error(c, http.StatusUnauthorized, 40101, err.Error())
+		return
+	}
+
+	util.Success(c, resp)
+}
+
 // Register 用户注册接口
 func (ctrl *UserController) Register(c *gin.Context) {
 	var req service.RegisterRequest

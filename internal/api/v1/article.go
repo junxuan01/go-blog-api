@@ -67,3 +67,25 @@ func (ctrl *ArticleController) ListArticles(c *gin.Context) {
 		"total":     2,
 	})
 }
+
+// CreateArticle 创建新文章
+// @Summary 创建新文章
+// @Tags 文章
+// @Param Authorization header string true "Bearer {token}"
+// @Param title body string true "文章标题"
+// @Param content body string true "文章内容"
+// @Success 200 {object} util.Response
+// @Router /api/v1/articles [post]
+func (ctrl *ArticleController) CreateArticle(c *gin.Context) {
+	// 从 Context 获取当前用户 ID
+	userID, exists := c.Get("userID")
+	if !exists {
+		util.Error(c, http.StatusUnauthorized, 401, "Unauthorized")
+		return
+	}
+	// ... 业务逻辑，使用 userID 创建文章
+	util.Success(c, map[string]any{
+		"user_id": userID,
+		"status":  "created",
+	})
+}
