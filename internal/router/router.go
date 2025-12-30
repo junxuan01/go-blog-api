@@ -6,6 +6,8 @@ import (
 	"go-blog-api/pkg/config"
 
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 )
 
 func InitRouter() *gin.Engine {
@@ -15,6 +17,9 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())   // 日志中间件
 	r.Use(gin.Recovery()) // 恢复中间件，防止崩溃
+
+	// Swagger 文档路由
+	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 
 	// 初始化 Controller
 	articleCtrl := v1.NewArticleController()

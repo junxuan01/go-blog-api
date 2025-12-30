@@ -8,9 +8,9 @@ import (
 
 // Response 统一响应结构
 type Response struct {
-	Code    int    `json:"code"`           // 业务码，0 表示成功，非 0 表示失败
-	Message string `json:"message"`        // 提示信息
-	Data    any    `json:"data,omitempty"` // 返回数据
+	Code    int    `json:"code"`    // 业务码，0 表示成功，非 0 表示失败
+	Message string `json:"message"` // 提示信息
+	Data    any    `json:"data"`    // 返回数据，无数据时为 null
 }
 
 // Success 构建成功响应

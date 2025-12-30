@@ -25,6 +25,16 @@ func NewUserController() *UserController {
 }
 
 // Login 用户登录接口
+// @Summary      用户登录
+// @Description  使用用户名和密码登录，返回 JWT Token
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.LoginRequest  true  "登录信息"
+// @Success      200      {object}  util.Response{data=dto.LoginResponse}
+// @Failure      400      {object}  util.Response  "参数错误"
+// @Failure      401      {object}  util.Response  "用户名或密码错误"
+// @Router       /auth/login [post]
 func (ctrl *UserController) Login(c *gin.Context) {
 	var req dto.LoginRequest
 	// 参数绑定与校验
@@ -44,6 +54,16 @@ func (ctrl *UserController) Login(c *gin.Context) {
 }
 
 // Register 用户注册接口
+// @Summary      用户注册
+// @Description  注册新用户账号
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Param        request  body      dto.RegisterRequest  true  "注册信息"
+// @Success      200      {object}  util.Response  "注册成功"
+// @Failure      400      {object}  util.Response  "参数错误"
+// @Failure      409      {object}  util.Response  "用户名或邮箱已存在"
+// @Router       /auth/register [post]
 func (ctrl *UserController) Register(c *gin.Context) {
 	var req dto.RegisterRequest
 	// 参数绑定与校验

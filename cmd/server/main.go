@@ -8,7 +8,29 @@ import (
 	"go-blog-api/internal/router"
 	"go-blog-api/pkg/config"
 	"go-blog-api/pkg/db"
+
+	_ "go-blog-api/docs" // Swagger docs
 )
+
+// @title           Go Blog API
+// @version         1.0
+// @description     一个学习 Go Web 开发的博客后端 API 项目
+// @termsOfService  http://swagger.io/terms/
+
+// @contact.name   API Support
+// @contact.url    https://github.com/guoxiangwen/go-blog-api
+// @contact.email  support@example.com
+
+// @license.name  MIT
+// @license.url   https://opensource.org/licenses/MIT
+
+// @host      localhost:8080
+// @BasePath  /api/v1
+
+// @securityDefinitions.apikey BearerAuth
+// @in header
+// @name Authorization
+// @description 输入 Bearer {token} 格式
 
 func main() {
 	// 1. 初始化配置
