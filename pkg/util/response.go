@@ -30,3 +30,21 @@ func Error(c *gin.Context, httpCode int, errCode int, msg string) {
 		Data:    nil,
 	})
 }
+
+// HandleError 统一错误处理，自动识别 BizError 类型
+func HandleError(c *gin.Context, err error) {
+	if bizErr, ok := err.(*BizError); ok {
+		c.JSON(bizErr.HttpCode, Response{
+			Code:    bizErr.Code,
+			Message: bizErr.Msg,
+			Data:    nil,
+		})
+		return
+	}
+	// 未知错误统一返回 500
+	c.JSON(http.StatusInternalServerError, Response{
+		Code:    50000,
+		Message: "服务器内部错误",
+		Data:    nil,
+	})
+}

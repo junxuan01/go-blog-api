@@ -1,7 +1,7 @@
 package service
 
 import (
-	"errors"
+	"go-blog-api/internal/dto"
 	"go-blog-api/internal/model"
 	"go-blog-api/internal/repository"
 	"go-blog-api/pkg/util"
@@ -13,19 +13,6 @@ import (
 type UserService struct {
 	userRepo repository.IUserRepository
 }
-type LoginRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required"`
-}
-type LoginResponse struct {
-	Token string     `json:"token"`
-	User  model.User `json:"user"`
-}
-type RegisterRequest struct {
-	Username string `json:"username" binding:"required"`
-	Password string `json:"password" binding:"required,min=6"`
-	Email    string `json:"email" binding:"required,email"`
-}
 
 // NewUserService 构造函数，目前内部自己创建依赖
 // 后面我们会讨论如何通过依赖注入把这个依赖从外部传进来
@@ -34,17 +21,17 @@ func NewUserService(userRepo repository.IUserRepository) *UserService {
 }
 
 // Login 用户登录
-func (s *UserService) Login(req *LoginRequest) (*LoginResponse, error) {
+func (s *UserService) Login(req *dto.LoginRequest) (*dto.LoginResponse, error) {
 	// 1. 查询用户
 	user, err := s.userRepo.GetByUsername(req.Username)
 	if err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, util.ErrUserNotFound.WithMsg("用户名或密码错误")
 	}
 
 	// 2. 校验密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, errors.New("invalid username or password")
+		return nil, util.ErrUnauthorized.WithMsg("用户名或密码错误")
 	}
 
 	// 3. 生成 Token
@@ -53,22 +40,21 @@ func (s *UserService) Login(req *LoginRequest) (*LoginResponse, error) {
 		return nil, err
 	}
 
-	return &LoginResponse{
+	return &dto.LoginResponse{
 		Token: token,
 		User:  *user,
 	}, nil
 }
 
 // Register 注册新用户
-func (s *UserService) Register(req RegisterRequest) error {
-
+func (s *UserService) Register(req dto.RegisterRequest) error {
 	// 1. 检查用户名是否存在
 	if _, err := s.userRepo.GetByUsername(req.Username); err == nil {
-		return errors.New("username already exists")
+		return util.ErrUsernameExists
 	}
 	// 2. 检查邮箱是否存在
 	if _, err := s.userRepo.GetByEmail(req.Email); err == nil {
-		return errors.New("email already exists")
+		return util.ErrEmailExists
 	}
 	// 3. 密码加密
 	hashedPwd, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)

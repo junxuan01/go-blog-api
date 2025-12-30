@@ -4,3 +4,8 @@ server:
 
 database:
   dsn: "root:password@tcp(127.0.0.1:3306)/blog_db?charset=utf8mb4&parseTime=True&loc=Local"
+
+jwt:
+  secret: "your_secret_key_change_in_production"
+  expire_hours: 24
+  issuer: "go-blog-api"

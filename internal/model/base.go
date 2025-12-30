@@ -6,7 +6,7 @@ import (
 	"gorm.io/gorm"
 )
 
-// model 包用于定义 GORM 数据库模型，此处先占位，后续可添加 User、Post 等结构体。
+// BaseModel 基础模型，包含通用字段
 
 type BaseModel struct {
 	ID        uint           `gorm:"primaryKey" json:"id"`

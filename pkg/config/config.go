@@ -9,6 +9,7 @@ import (
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig
+	JWT      JWTConfig
 }
 
 type ServerConfig struct {
@@ -18,6 +19,12 @@ type ServerConfig struct {
 
 type DatabaseConfig struct {
 	DSN string
+}
+
+type JWTConfig struct {
+	Secret      string `mapstructure:"secret"`
+	ExpireHours int    `mapstructure:"expire_hours"`
+	Issuer      string `mapstructure:"issuer"`
 }
 
 var AppConfig *Config

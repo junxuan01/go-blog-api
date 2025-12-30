@@ -1,10 +1,10 @@
 package v1
 
 import (
+	"go-blog-api/internal/dto"
 	"go-blog-api/internal/repository"
 	"go-blog-api/internal/service"
 	"go-blog-api/pkg/util"
-	"net/http"
 
 	"github.com/gin-gonic/gin"
 )
@@ -26,17 +26,17 @@ func NewUserController() *UserController {
 
 // Login 用户登录接口
 func (ctrl *UserController) Login(c *gin.Context) {
-	var req service.LoginRequest
+	var req dto.LoginRequest
 	// 参数绑定与校验
 	if err := c.ShouldBindJSON(&req); err != nil {
-		util.Error(c, http.StatusBadRequest, 40001, err.Error())
+		util.HandleError(c, util.ErrInvalidParam.WithMsg(err.Error()))
 		return
 	}
 
 	// 调用业务逻辑
 	resp, err := ctrl.userService.Login(&req)
 	if err != nil {
-		util.Error(c, http.StatusUnauthorized, 40101, err.Error())
+		util.HandleError(c, err)
 		return
 	}
 
@@ -45,16 +45,16 @@ func (ctrl *UserController) Login(c *gin.Context) {
 
 // Register 用户注册接口
 func (ctrl *UserController) Register(c *gin.Context) {
-	var req service.RegisterRequest
+	var req dto.RegisterRequest
 	// 参数绑定与校验
 	if err := c.ShouldBindJSON(&req); err != nil {
-		util.Error(c, http.StatusBadRequest, 40001, err.Error())
+		util.HandleError(c, util.ErrInvalidParam.WithMsg(err.Error()))
 		return
 	}
 
 	// 调用业务逻辑
 	if err := ctrl.userService.Register(req); err != nil {
-		util.Error(c, http.StatusInternalServerError, 50001, err.Error())
+		util.HandleError(c, err)
 		return
 	}
 

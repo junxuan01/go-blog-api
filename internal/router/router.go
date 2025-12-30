@@ -34,12 +34,11 @@ func InitRouter() *gin.Engine {
 		articles := apiV1.Group("/articles")
 		articles.Use(middleware.JWT()) // 挂载中间件
 		{
-			// GET /api/v1/articles/:id
-			articles.GET(":id", articleCtrl.GetArticle)
-			// 后续会在这里继续挂载：
 			articles.GET("", articleCtrl.ListArticles)
-			// articles.POST("", articleCtrl.CreateArticle)
-			// articles.PUT(":id", articleCtrl.UpdateArticle)
+			articles.GET(":id", articleCtrl.GetArticle)
+			articles.POST("", articleCtrl.CreateArticle)
+			articles.PUT(":id", articleCtrl.UpdateArticle)
+			articles.DELETE(":id", articleCtrl.DeleteArticle)
 		}
 	}
 	return r
