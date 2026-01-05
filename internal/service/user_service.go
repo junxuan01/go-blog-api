@@ -70,3 +70,68 @@ func (s *UserService) Register(req dto.RegisterRequest) error {
 	}
 	return s.userRepo.CreateUser(user)
 }
+
+// GetByID 获取用户详情
+func (s *UserService) GetByID(id uint) (*model.User, error) {
+	user, err := s.userRepo.GetByID(id)
+	if err != nil {
+		return nil, util.ErrUserNotFound
+	}
+	return user, nil
+}
+
+// Update 更新用户信息
+func (s *UserService) Update(id uint, req *dto.UpdateUserRequest) (*model.User, error) {
+	// 1. 查询用户
+	user, err := s.userRepo.GetByID(id)
+	if err != nil {
+		return nil, util.ErrUserNotFound
+	}
+
+	// 2. 检查邮箱是否被其他用户使用
+	if req.Email != "" && req.Email != user.Email {
+		if existingUser, _ := s.userRepo.GetByEmail(req.Email); existingUser != nil && existingUser.ID != id {
+			return nil, util.ErrEmailExists
+		}
+		user.Email = req.Email
+	}
+
+	// 3. 更新头像
+	if req.Avatar != "" {
+		user.Avatar = req.Avatar
+	}
+
+	// 4. 保存
+	if err := s.userRepo.Update(user); err != nil {
+		return nil, util.ErrDatabase
+	}
+
+	return user, nil
+}
+
+// Delete 删除用户
+func (s *UserService) Delete(id uint) error {
+	// 1. 检查用户是否存在
+	if _, err := s.userRepo.GetByID(id); err != nil {
+		return util.ErrUserNotFound
+	}
+
+	// 2. 删除
+	if err := s.userRepo.Delete(id); err != nil {
+		return util.ErrDatabase
+	}
+
+	return nil
+}
+
+// List 获取用户列表
+func (s *UserService) List(req *dto.ListUsersRequest) (*dto.PageResponse[model.User], error) {
+	req.SetDefaults()
+
+	users, total, err := s.userRepo.List(req.Offset(), req.PageSize, req.Keyword)
+	if err != nil {
+		return nil, util.ErrDatabase
+	}
+
+	return dto.NewPageResponse(users, total, req.Page, req.PageSize), nil
+}

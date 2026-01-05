@@ -89,26 +89,13 @@ func (s *ArticleService) Delete(id, userID uint) error {
 }
 
 // List 获取文章列表
-func (s *ArticleService) List(req *dto.ListArticlesRequest) (*dto.ArticleListResponse, error) {
-	// 默认值
-	if req.Page <= 0 {
-		req.Page = 1
-	}
-	if req.PageSize <= 0 {
-		req.PageSize = 10
-	}
+func (s *ArticleService) List(req *dto.ListArticlesRequest) (*dto.PageResponse[model.Article], error) {
+	req.SetDefaults()
 
-	offset := (req.Page - 1) * req.PageSize
-
-	articles, total, err := s.articleRepo.List(offset, req.PageSize)
+	articles, total, err := s.articleRepo.List(req.Offset(), req.PageSize)
 	if err != nil {
 		return nil, util.ErrDatabase
 	}
 
-	return &dto.ArticleListResponse{
-		Articles: articles,
-		Total:    total,
-		Page:     req.Page,
-		PageSize: req.PageSize,
-	}, nil
+	return dto.NewPageResponse(articles, total, req.Page, req.PageSize), nil
 }

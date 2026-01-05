@@ -28,7 +28,7 @@ func InitRouter() *gin.Engine {
 	apiV1 := r.Group("/api/v1")
 	{
 
-		// /api/v1/auth 用户相关
+		// /api/v1/auth auth相关
 		auth := apiV1.Group("/auth")
 		{
 			auth.POST("/login", userCtrl.Login)
@@ -39,11 +39,21 @@ func InitRouter() *gin.Engine {
 		articles := apiV1.Group("/articles")
 		articles.Use(middleware.JWT()) // 挂载中间件
 		{
-			articles.GET("", articleCtrl.ListArticles)
+			articles.POST("/list", articleCtrl.ListArticles)
 			articles.GET(":id", articleCtrl.GetArticle)
 			articles.POST("", articleCtrl.CreateArticle)
 			articles.PUT(":id", articleCtrl.UpdateArticle)
 			articles.DELETE(":id", articleCtrl.DeleteArticle)
+		}
+
+		// /api/v1/users 用户管理接口
+		users := apiV1.Group("/users")
+		users.Use(middleware.JWT()) // 需要登录
+		{
+			users.POST("/list", userCtrl.ListUsers)
+			users.GET(":id", userCtrl.GetUser)
+			users.PUT(":id", userCtrl.UpdateUser)
+			users.DELETE(":id", userCtrl.DeleteUser)
 		}
 	}
 	return r

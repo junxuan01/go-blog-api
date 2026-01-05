@@ -58,15 +58,14 @@ func (ctrl *ArticleController) GetArticle(c *gin.Context) {
 // @Accept       json
 // @Produce      json
 // @Security     BearerAuth
-// @Param        page       query     int  false  "页码"      default(1)
-// @Param        page_size  query     int  false  "每页数量"  default(10)
-// @Success      200        {object}  util.Response{data=dto.ArticleListResponse}
-// @Failure      400        {object}  util.Response  "参数错误"
-// @Failure      401        {object}  util.Response  "未授权"
-// @Router       /articles [get]
+// @Param        request  body      dto.ListArticlesRequest  true  "分页参数"
+// @Success      200      {object}  util.Response{data=dto.ArticlePageResponse}
+// @Failure      400      {object}  util.Response  "参数错误"
+// @Failure      401      {object}  util.Response  "未授权"
+// @Router       /articles/list [post]
 func (ctrl *ArticleController) ListArticles(c *gin.Context) {
 	var req dto.ListArticlesRequest
-	if err := c.ShouldBindQuery(&req); err != nil {
+	if err := c.ShouldBindJSON(&req); err != nil {
 		util.HandleError(c, util.ErrInvalidParam.WithMsg(err.Error()))
 		return
 	}

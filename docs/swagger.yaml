@@ -1,8 +1,8 @@
 basePath: /api/v1
 definitions:
-  dto.ArticleListResponse:
+  dto.ArticlePageResponse:
     properties:
-      articles:
+      list:
         items:
           $ref: '#/definitions/model.Article'
         type: array
@@ -24,6 +24,29 @@ definitions:
     required:
     - content
     - title
+    type: object
+  dto.ListArticlesRequest:
+    properties:
+      page:
+        minimum: 1
+        type: integer
+      page_size:
+        maximum: 100
+        minimum: 1
+        type: integer
+    type: object
+  dto.ListUsersRequest:
+    properties:
+      keyword:
+        description: 搜索关键词（用户名/邮箱）
+        type: string
+      page:
+        minimum: 1
+        type: integer
+      page_size:
+        maximum: 100
+        minimum: 1
+        type: integer
     type: object
   dto.LoginRequest:
     properties:
@@ -64,6 +87,26 @@ definitions:
         maxLength: 255
         minLength: 1
         type: string
+    type: object
+  dto.UpdateUserRequest:
+    properties:
+      avatar:
+        type: string
+      email:
+        type: string
+    type: object
+  dto.UserPageResponse:
+    properties:
+      list:
+        items:
+          $ref: '#/definitions/model.User'
+        type: array
+      page:
+        type: integer
+      page_size:
+        type: integer
+      total:
+        type: integer
     type: object
   model.Article:
     properties:
@@ -107,7 +150,7 @@ definitions:
         description: 业务码，0 表示成功，非 0 表示失败
         type: integer
       data:
-        description: 返回数据
+        description: 返回数据，无数据时为 null
       message:
         description: 提示信息
         type: string
@@ -127,46 +170,6 @@ info:
   version: "1.0"
 paths:
   /articles:
-    get:
-      consumes:
-      - application/json
-      description: 分页获取文章列表
-      parameters:
-      - default: 1
-        description: 页码
-        in: query
-        name: page
-        type: integer
-      - default: 10
-        description: 每页数量
-        in: query
-        name: page_size
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            allOf:
-            - $ref: '#/definitions/util.Response'
-            - properties:
-                data:
-                  $ref: '#/definitions/dto.ArticleListResponse'
-              type: object
-        "400":
-          description: 参数错误
-          schema:
-            $ref: '#/definitions/util.Response'
-        "401":
-          description: 未授权
-          schema:
-            $ref: '#/definitions/util.Response'
-      security:
-      - BearerAuth: []
-      summary: 获取文章列表
-      tags:
-      - 文章
     post:
       consumes:
       - application/json
@@ -330,6 +333,43 @@ paths:
       summary: 更新文章
       tags:
       - 文章
+  /articles/list:
+    post:
+      consumes:
+      - application/json
+      description: 分页获取文章列表
+      parameters:
+      - description: 分页参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ListArticlesRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.ArticlePageResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取文章列表
+      tags:
+      - 文章
   /auth/login:
     post:
       consumes:
@@ -395,6 +435,170 @@ paths:
       summary: 用户注册
       tags:
       - 认证
+  /users/{id}:
+    delete:
+      consumes:
+      - application/json
+      description: 删除指定用户（仅管理员或本人）
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: 删除成功
+          schema:
+            $ref: '#/definitions/util.Response'
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/util.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerAuth: []
+      summary: 删除用户
+      tags:
+      - 用户
+    get:
+      consumes:
+      - application/json
+      description: 根据用户 ID 获取用户信息
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.User'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取用户详情
+      tags:
+      - 用户
+    put:
+      consumes:
+      - application/json
+      description: 更新当前登录用户的信息
+      parameters:
+      - description: 用户 ID
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: 更新内容
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.UpdateUserRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/model.User'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/util.Response'
+        "403":
+          description: 无权限
+          schema:
+            $ref: '#/definitions/util.Response'
+        "404":
+          description: 用户不存在
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerAuth: []
+      summary: 更新用户信息
+      tags:
+      - 用户
+  /users/list:
+    post:
+      consumes:
+      - application/json
+      description: 分页获取用户列表，支持关键词搜索
+      parameters:
+      - description: 分页参数
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/dto.ListUsersRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            allOf:
+            - $ref: '#/definitions/util.Response'
+            - properties:
+                data:
+                  $ref: '#/definitions/dto.UserPageResponse'
+              type: object
+        "400":
+          description: 参数错误
+          schema:
+            $ref: '#/definitions/util.Response'
+        "401":
+          description: 未授权
+          schema:
+            $ref: '#/definitions/util.Response'
+      security:
+      - BearerAuth: []
+      summary: 获取用户列表
+      tags:
+      - 用户
 securityDefinitions:
   BearerAuth:
     description: 输入 Bearer {token} 格式
