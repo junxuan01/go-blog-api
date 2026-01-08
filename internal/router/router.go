@@ -17,6 +17,8 @@ func InitRouter() *gin.Engine {
 	r := gin.New()
 	r.Use(gin.Logger())   // 日志中间件
 	r.Use(gin.Recovery()) // 恢复中间件，防止崩溃
+	// CORS 中间件，允许本地前端开发访问
+	r.Use(middleware.CORS())
 
 	// Swagger 文档路由
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
