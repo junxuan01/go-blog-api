@@ -35,6 +35,8 @@ func InitRouter() *gin.Engine {
 		{
 			auth.POST("/login", userCtrl.Login)
 			auth.POST("/register", userCtrl.Register)
+			// 需要登录才能访问
+			auth.GET("/me", middleware.JWT(), userCtrl.GetMe)
 		}
 
 		// /api/v1/articles 相关接口

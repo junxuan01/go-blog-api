@@ -83,6 +83,34 @@ func (ctrl *UserController) Register(c *gin.Context) {
 	util.Success(c, nil)
 }
 
+// GetMe 获取当前登录用户信息
+// @Summary      获取当前用户信息
+// @Description  获取当前登录用户的详细信息
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  util.Response{data=model.User}
+// @Failure      401  {object}  util.Response  "未授权"
+// @Failure      404  {object}  util.Response  "用户不存在"
+// @Router       /auth/me [get]
+func (ctrl *UserController) GetMe(c *gin.Context) {
+	// 从 JWT 中间件获取用户 ID
+	userID, exists := c.Get("userID")
+	if !exists {
+		util.HandleError(c, util.ErrUnauthorized)
+		return
+	}
+
+	user, err := ctrl.userService.GetByID(userID.(uint))
+	if err != nil {
+		util.HandleError(c, err)
+		return
+	}
+
+	util.Success(c, user)
+}
+
 // GetUser 获取用户详情
 // @Summary      获取用户详情
 // @Description  根据用户 ID 获取用户信息
