@@ -111,6 +111,27 @@ func (ctrl *UserController) GetMe(c *gin.Context) {
 	util.Success(c, user)
 }
 
+// Logout 注销当前登录用户（无服务器端会话，仅示意接口）
+// @Summary      注销
+// @Description  注销当前登录用户（客户端需要清除本地 token）
+// @Tags         认证
+// @Accept       json
+// @Produce      json
+// @Security     BearerAuth
+// @Success      200  {object}  util.Response  "登出成功"
+// @Failure      401  {object}  util.Response  "未授权"
+// @Router       /auth/logout [post]
+func (ctrl *UserController) Logout(c *gin.Context) {
+	userID, exists := c.Get("userID")
+	if !exists || userID == nil {
+		util.HandleError(c, util.ErrUnauthorized)
+		return
+	}
+
+	// 这里没有服务器端会话需要清理；如果需要，可实现 token 黑名单
+	util.Success(c, nil)
+}
+
 // GetUser 获取用户详情
 // @Summary      获取用户详情
 // @Description  根据用户 ID 获取用户信息

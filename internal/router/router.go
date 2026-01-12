@@ -37,6 +37,8 @@ func InitRouter() *gin.Engine {
 			auth.POST("/register", userCtrl.Register)
 			// 需要登录才能访问
 			auth.GET("/me", middleware.JWT(), userCtrl.GetMe)
+			// 注销（客户端清除 token 即可，后端保留接口以便未来扩展）
+			auth.POST("/logout", middleware.JWT(), userCtrl.Logout)
 		}
 
 		// /api/v1/articles 相关接口

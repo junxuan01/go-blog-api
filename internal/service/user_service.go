@@ -135,3 +135,9 @@ func (s *UserService) List(req *dto.ListUsersRequest) (*dto.PageResponse[model.U
 
 	return dto.NewPageResponse(users, total, req.Page, req.PageSize), nil
 }
+
+// Logout 注销用户（当前实现为无状态，服务端无需额外操作）
+func (s *UserService) Logout(userID uint) error {
+	// 如果将来需要在服务端维护 token 黑名单或会话表，可在这里实现
+	return nil
+}
