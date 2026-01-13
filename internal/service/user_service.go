@@ -25,13 +25,13 @@ func (s *UserService) Login(req *dto.LoginRequest) (*dto.LoginResponse, error) {
 	// 1. 查询用户
 	user, err := s.userRepo.GetByUsername(req.Username)
 	if err != nil {
-		return nil, util.ErrUserNotFound.WithMsg("用户名或密码错误")
+		return nil, util.ErrInvalidCredentials
 	}
 
 	// 2. 校验密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return nil, util.ErrUnauthorized.WithMsg("用户名或密码错误")
+		return nil, util.ErrInvalidCredentials
 	}
 
 	// 3. 生成 Token
