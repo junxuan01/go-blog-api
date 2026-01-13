@@ -35,7 +35,7 @@ func (r *ArticleRepository) Create(article *model.Article) error {
 // GetByID 根据 ID 获取文章
 func (r *ArticleRepository) GetByID(id uint) (*model.Article, error) {
 	var article model.Article
-	if err := r.db.First(&article, id).Error; err != nil {
+	if err := r.db.Preload("User").First(&article, id).Error; err != nil {
 		return nil, err
 	}
 	return &article, nil
@@ -60,7 +60,8 @@ func (r *ArticleRepository) List(offset, limit int) ([]model.Article, int64, err
 		return nil, 0, err
 	}
 
-	if err := r.db.Offset(offset).Limit(limit).Order("created_at DESC").Find(&articles).Error; err != nil {
+	// Preload User 信息
+	if err := r.db.Preload("User").Offset(offset).Limit(limit).Order("created_at DESC").Find(&articles).Error; err != nil {
 		return nil, 0, err
 	}
 
@@ -78,7 +79,8 @@ func (r *ArticleRepository) ListByUserID(userID uint, offset, limit int) ([]mode
 		return nil, 0, err
 	}
 
-	if err := query.Offset(offset).Limit(limit).Order("created_at DESC").Find(&articles).Error; err != nil {
+	// Preload User 信息
+	if err := query.Preload("User").Offset(offset).Limit(limit).Order("created_at DESC").Find(&articles).Error; err != nil {
 		return nil, 0, err
 	}
 
